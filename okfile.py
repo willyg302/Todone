@@ -19,7 +19,7 @@ def gae_deploy():
 
 def build():
 	'''Build Todone'''
-	ok.node('gulp', module=True).run('lein cljsbuild once todone').run(generate_app_yaml)
+	ok.node('gulp', module=True).lein('cljsbuild once todone').run(generate_app_yaml)
 
 def install():
 	ok.npm('install').bower('install', root='app')
