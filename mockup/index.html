@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Todone</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="author" content="William Gaul">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.1/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="mockup.css">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+</head>
+<body>
+	<div id="app">
+		<header class="navbar navbar-default navbar-static-top" role="banner">
+			<div class="container">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="#">Todone</a>
+				</div>
+			</div>
+		</header>
+		<div id="calendar" class="container-fluid">
+			<div class="scroll">
+				<svg id="calendar-svg"></svg>
+			</div>
+		</div>
+		<div id="body" class="container">
+			<div class="row">
+				<div id="list" class="col-md-8">
+					<h1 class="page-header">Oct 9, 2014 &ndash; Nov 11, 2014</h1>
+					<div class="panel panel-default">
+						<div class="panel-body">
+							Walk the dog
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-body">
+							Call Mom
+						</div>
+					</div>
+				</div>
+				<div id="sidebar" class="col-md-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">Longest Chain</div>
+						<div class="panel-body">
+							<h1 class="text-center"><span id="longest-length"></span> days</h1>
+							<p class="text-center"><small id="longest-range"></small></p>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">Current Chain</div>
+						<div class="panel-body">
+							<h1 class="text-center"><span id="current-length"></span> days</h1>
+							<p class="text-center"><small id="current-range"></small></p>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	<script>
+		// Stored data
+		var start = '2014-09-09T21:57:52.310916';
+
+		// @NOTE: This is totally wrong since chains can have dummy days in them.
+		var longest = {
+			start: '2014-10-09T21:57:52.310916',
+			len: 34
+		};
+		var current = {
+			start: '2014-12-20T21:57:52.310916',
+			len: 3
+		};
+
+		// Calculated data
+		var startM = moment(start);
+		var today = moment()
+		var endM = today.clone().add(1, 'y');
+
+		// SVG format
+		var width = 36;
+		var padding = 4;
+		var svg = document.getElementById('calendar-svg');
+
+		function makeDay(m, w, p, offset) {
+			var day = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+			day.setAttribute('width', w);
+			day.setAttribute('height', w);
+			day.setAttribute('x', Math.floor(offset / 7) * (w + p));
+			day.setAttribute('y', m.day() * (w + p));
+
+			var color = '#eeeeee';
+			if (m.isSame(moment(), 'd')) {
+				color = 'red';
+			}
+
+			day.setAttribute('fill', color);
+			day.setAttribute('data-i', m);
+			return day;
+		}
+
+		var days = endM.diff(startM, 'd');
+		var startOffset = startM.day();
+		for (var i = 0; i < days; i++) {
+			svg.appendChild(makeDay(startM.clone().add(i, 'd'), width, padding, i + startOffset));
+		}
+		// Now that we know the width, set it
+		svg.setAttribute('width', (width + padding) * Math.ceil((days + startOffset) / 7) - padding);
+		svg.setAttribute('height', (width + padding) * 7 - padding);
+
+		// Set the chains info
+		function dateRangeString(range) {
+			var m = moment(range.start);
+			return m.format('MMM D, YYYY') + " &ndash; " + m.add(range.len - 1, 'd').format('MMM D, YYYY');
+		}
+		document.getElementById('longest-length').innerHTML = longest.len;
+		document.getElementById('current-length').innerHTML = current.len;
+		document.getElementById('longest-range').innerHTML = dateRangeString(longest);
+		document.getElementById('current-range').innerHTML = dateRangeString(current);
+	</script>
+</body>
+</html>
