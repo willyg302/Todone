@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Todone</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="author" content="William Gaul">
+	<style>
+		input {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			width: 300px;
+			margin-left: -156px;
+			margin-top: -28px;
+			padding: 5px;
+			font-size: 36px;
+			outline: 0;
+			border: 1px solid #607d8b;
+			text-align: center;
+		}
+		input:focus {
+			border-color: #03a9f4;
+		}
+	</style>
+	<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js"></script>
+	<script>
+		function onKeyDown(event, self) {
+			if (event.keyCode === 13) {
+				event.preventDefault();
+				self.style.color = 'white';
+				var auth = self.form['auth'];
+				auth.value = CryptoJS.SHA256(auth.value);
+				self.form.submit();
+				return false;
+			}
+		}
+	</script>
+</head>
+<body>
+	<form action="/auth" method="post">
+		<input type="password" name="auth" onkeydown="onKeyDown(event, this);">
+	</form>
+</body>
+</html>
