@@ -7,10 +7,9 @@ var del        = require('del');
 
 var paths = {
 	assets: [
-		'./app/index.html',
-		'./app/auth.html',
-		'./app/app.yaml',
-		'./app/todone.go'
+		'./app/*.html',
+		'./app/*.yaml',
+		'./app/*.go'
 	],
 	app: './app',
 	dist: './dist',

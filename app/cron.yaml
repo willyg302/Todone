@@ -1,0 +1,4 @@
+cron:
+- description: daily todo aggregation
+  url: /cron
+  schedule: every day 00:00
