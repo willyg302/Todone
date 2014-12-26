@@ -1,19 +1,17 @@
 project = 'Todone'
 
-def generate_app_yaml():
-	'''Generate production app.yaml'''
-	with open('dist/app.yaml', 'r+') as f:
-		data = f.read().replace('{{ appname }}', raw_input('App name: '))
+def _fill_template(filename, template, value):
+	with open(filename, 'r+') as f:
+		data = f.read().replace("{{ " + template + " }}", value)
 		f.seek(0)
 		f.write(data)
 		f.truncate()
+
+def fill_templates():
+	_fill_template('dist/app.yaml', 'appname', raw_input('App name: '))
 	import getpass
 	import hashlib
-	with open('dist/todone.go', 'r+') as f:
-		data = f.read().replace('{{ appkey }}', hashlib.sha256(getpass.getpass('App key: ')).hexdigest())
-		f.seek(0)
-		f.write(data)
-		f.truncate()
+	_fill_template('dist/todone.go', 'appkey', hashlib.sha256(getpass.getpass('App key: ')).hexdigest())
 
 def gae_server():
 	'''Run local App Engine server'''
@@ -25,7 +23,7 @@ def gae_deploy():
 
 def build_server():
 	'''Build only server-side, skipping Leiningen and CSS'''
-	ok.node('gulp copy-assets', module=True).run(generate_app_yaml)
+	ok.node('gulp copy-assets', module=True).run(fill_templates)
 
 def build_css():
 	'''Build only CSS'''
@@ -33,7 +31,7 @@ def build_css():
 
 def build():
 	'''Build Todone'''
-	ok.node('gulp', module=True).lein('cljsbuild once todone').run(generate_app_yaml)
+	ok.node('gulp', module=True).lein('cljsbuild once todone').run(fill_templates)
 
 def install():
 	ok.npm('install').bower('install', root='app')
