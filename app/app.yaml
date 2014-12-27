@@ -5,14 +5,17 @@ api_version: go1
 
 handlers:
 - url: /favicon.ico
-  static_files: favicon.ico
-  upload: favicon.ico
+  static_files: img/favicon.ico
+  upload: img/favicon.ico
 
 - url: /js
   static_dir: js
 
 - url: /css
   static_dir: css
+
+- url: /img
+  static_dir: img
 
 - url: /cron
   script: _go_app

@@ -1,11 +1,12 @@
 (defproject todone "0.1.0-SNAPSHOT"
-  :description "FIXME: write this!"
-  :url "http://example.com/FIXME"
+  :description "Go from to-do to done without breaking the chain"
+  :url "https://github.com/willyg302/Todone"
 
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2371"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [om "0.7.3"]]
+                 [reagent "0.5.0-alpha"]
+                 [cljs-ajax "0.3.3"]]
 
   :plugins [[lein-cljsbuild "1.0.4-SNAPSHOT"]]
 
@@ -20,7 +21,7 @@
                 :elide-asserts true
                 :pretty-print false
                 :output-wrapper false
-                :preamble ["react/react.min.js"]
-                :externs ["react/react.js"]
+                :preamble ["reagent/react.min.js"]
+                :externs ["reagent/react.js"]
                 :closure-warnings {:externs-validation :off
                                    :non-standard-jsdoc :off}}}]})

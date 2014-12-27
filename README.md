@@ -1,4 +1,6 @@
-# Todone
+![Todone](https://raw.github.com/willyg302/Todone/master/todone-logo.png "To live is to keep moving.")
+
+-----
 
 Go from "to-do" to "done" without breaking [the chain](http://lifehacker.com/281626/jerry-seinfelds-productivity-secret).
 

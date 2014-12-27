@@ -216,7 +216,7 @@ type Achievement struct {
 	Awarded bool
 }
 
-
+// @TODO
 // Get all todos intersecting date range
 
 // Modify Day status (only to set to vacation, all other is determined server-side)
@@ -268,5 +268,5 @@ func handleAPI(w http.ResponseWriter, r *http.Request) {
 ////////////////////////////////////////
 
 func handleCron(w http.ResponseWriter, r *http.Request) {
-	//
+	// @TODO
 }

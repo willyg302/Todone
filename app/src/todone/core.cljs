@@ -1,15 +1,11 @@
 (ns todone.core
-  (:require [om.core :as om :include-macros true]
-            [om.dom :as dom :include-macros true]))
+  (:require [reagent.core :as reagent :refer [atom]]))
 
 (enable-console-print!)
 
 (def app-state (atom {:text "Hello world!"}))
 
-(defn todone-app [app owner]
-  (reify om/IRender
-    (render [_]
-      (dom/h1 nil (:text app)))))
+(defn todone-app []
+  [:h1 (@app-state :text)])
 
-(om/root todone-app app-state
-  {:target (.getElementById js/document "app")})
+(reagent/render-component [todone-app] (.getElementById js/document "app"))
