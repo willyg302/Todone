@@ -29,6 +29,10 @@ def build_css():
 	'''Build only CSS'''
 	ok.node('gulp compile-css', module=True)
 
+def build_client():
+	'''Build only client-side'''
+	ok.run(build_css).lein('cljsbuild once todone')
+
 def build():
 	'''Build Todone'''
 	ok.node('gulp', module=True).lein('cljsbuild once todone').run(fill_templates)

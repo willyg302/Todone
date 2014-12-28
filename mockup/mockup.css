@@ -45,3 +45,11 @@ header.navbar {
 #sidebar h1, #sidebar p {
 	margin: 0;
 }
+
+.navbar-brand {
+	padding: 8px 8px;
+}
+
+.navbar-brand img {
+	height: 100%;
+}

@@ -1,3 +1,37 @@
-h1 {
-	color: red;
+header.navbar {
+	margin-bottom: 0;
+	border-bottom: 0;
+
+	.navbar-brand {
+		padding: 8px 8px;
+
+		& > img {
+			height: 100%
+		}
+	}
+}
+
+.calendar-bg {
+	padding: 0;
+	overflow: hidden;
+	overflow-x: auto;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: @navbar-height;
+	height: @calendar-bg-height;
+	#gradient > .vertical(@start-color: @color-ash-light; @end-color: @color-ash-dark);
+
+	.scroll {
+		overflow-x: scroll;
+		position: absolute;
+		bottom: -20px;
+		max-width: 100%;
+	}
+}
+
+#calendar {
+	margin: @day-tile-bounds;
+	margin-top: 0;
+	height: @calendar-height;
 }

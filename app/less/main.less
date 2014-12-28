@@ -1,8 +1,17 @@
 @bootless: '../bower_components/bootstrap/less/';
 
-// Useful Bootstrap mixins
+// Needed Bootstrap mixins
 @import "@{bootless}mixins/background-variant.less";
+@import "@{bootless}mixins/border-radius.less";
+@import "@{bootless}mixins/center-block.less";
+@import "@{bootless}mixins/clearfix.less";
+@import "@{bootless}mixins/forms.less";
+@import "@{bootless}mixins/gradients.less";
+@import "@{bootless}mixins/grid.less";
+@import "@{bootless}mixins/grid-framework.less";
+@import "@{bootless}mixins/hide-text.less";
 @import "@{bootless}mixins/image.less";
+@import "@{bootless}mixins/nav-vertical-align.less";
 @import "@{bootless}mixins/tab-focus.less";
 @import "@{bootless}mixins/text-emphasis.less";
 @import "@{bootless}mixins/text-overflow.less";
@@ -11,15 +20,20 @@
 // Reset
 @import "@{bootless}normalize.less";
 
-// Other Bootstrap stuff
+// Other Bootstrap stuff (order matters here!)
 @import "@{bootless}scaffolding.less";
 @import "@{bootless}variables.less";
+@import "@{bootless}utilities.less";
+@import "@{bootless}grid.less";
 @import "@{bootless}type.less";
+
 @import "@{bootless}code.less";
+@import "@{bootless}forms.less";
+@import "@{bootless}navbar.less";
+
 
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:300,400,700);
 
 // Todone styles
 @import "variables.less";
-//@import "mixins.less";
 @import "app.less";
