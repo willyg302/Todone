@@ -1,41 +1,63 @@
 (ns todone.core
-  (:require [reagent.core :as reagent :refer [atom]]))
+  (:require [reagent.core :as reagent :refer [atom]]
+            [ajax.core :as ajax]
+            [cljs-time.core :as moment]))
 
 (enable-console-print!)
 
 (def app-state (atom {:text "Hello world!"}))
+
+; @TODO: This is just a placeholder, actually grab from AJAX
+(def cal (moment/interval (moment/date-time 2014 9 9)
+                          (moment/plus (moment/now) (moment/years 1))))
+
+
+(defn today? [val]
+  (let [today (moment/now)]
+    (and (= (moment/year val) (moment/year today))
+         (= (moment/month val) (moment/month today))
+         (= (moment/day val) (moment/day today)))))
 
 
 ;;;; COMPONENTS
 
 ; @TODO: SO MANY MAGIC NUMBERS. MUST GET RID OF
 
+
 (defn header []
-  [:header.navbar.navbar-default.navbar-static-top {:role "banner"}
+  [:header
     [:div.container
-      [:div.navbar-header
-        [:a.navbar-brand {:href "#"}
-          [:img {:src "img/todone-logo.svg"}]]]]])
+      [:a.brand {:href "#"}
+        [:img {:src "img/todone-logo.svg"}]]
+      [:button {:class "btn btn-default navbar-btn pull-right"
+                :type "button"
+                :on-click #(ajax/POST
+                            "/logout"
+                            {:handler (fn [response] (js/location.reload))})}
+               "Log Out"]]])
 
-(defn day [w p offset]
-  [:rect.day {:width w
-              :height w
-              :x (* (quot offset 7) (+ w p))
-              :y (* (rem offset 7) (+ w p))
-              :fill "#eeeeee"
-              :data-i offset}])
+(defn day [m w p offset]
+  [:rect {:width w
+          :height w
+          :x (* (quot offset 7) (+ w p))
+          :y (* (rem offset 7) (+ w p))
+          :fill (if (today? m) "red" "#eeeeee")
+          :data-i m}])
 
-(defn calendar [days]
-  [:div.calendar-bg.container-fluid
-    [:div.scroll
-      [:svg#calendar {:width (- (* 40 (js/Math.ceil (/ 365 7))) 4)}
-        (for [d days]
-          ^{:key d} [day 36 4 d])]]])
+(defn calendar [num-days]
+  (let [start-offset (mod (moment/day-of-week (moment/start cal)) 7)
+        cal-width (- (* 40 (js/Math.ceil (/ (+ num-days start-offset) 7))) 4)]
+    [:div.calendar-bg.container-fluid
+      [:div.scroll
+        [:svg#calendar {:width cal-width}
+          (for [d (range num-days)]
+            ^{:key d} (let [m (moment/plus (moment/start cal) (moment/days d))]
+                        [day m 36 4 (+ d start-offset)]))]]]))
 
 (defn todone-app []
   [:div
     [header]
-    [calendar (range 365)]])
+    [calendar (moment/in-days cal)]])
 
 
 ;;;; MAIN

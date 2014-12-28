@@ -1,12 +1,14 @@
-header.navbar {
-	margin-bottom: 0;
-	border-bottom: 0;
+header {
+	height: @navbar-height;
 
-	.navbar-brand {
-		padding: 8px 8px;
+	.brand {
+		padding: 8px 0;
+		height: @navbar-height;
+		float: left;
 
 		& > img {
-			height: 100%
+			height: 100%;
+			display: block;
 		}
 	}
 }

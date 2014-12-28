@@ -1,7 +1,4 @@
-header.navbar {
-	margin-bottom: 0;
-	border-bottom: 0;
-}
+
 
 #calendar {
 	overflow: hidden;
@@ -46,10 +43,18 @@ header.navbar {
 	margin: 0;
 }
 
-.navbar-brand {
-	padding: 8px 8px;
+header {
+	height: 50px;
 }
 
-.navbar-brand img {
+
+.brand {
+	padding: 8px 0;
+	height: 50px;
+	float: left;
+}
+
+.brand img {
 	height: 100%;
+	display: block;
 }

@@ -14,6 +14,7 @@ import(
 func init() {
 	http.HandleFunc("/", handleRoot)
 	http.HandleFunc("/auth", handleAuth)
+	http.HandleFunc("/logout", handleLogout)
 	http.HandleFunc("/todone", handleAPI)
 	http.HandleFunc("/cron", handleCron)
 }
@@ -49,7 +50,7 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 
 
 ////////////////////////////////////////
-// AUTHENTICATION
+// AUTHENTICATION & LOGOUT
 ////////////////////////////////////////
 
 var APP_KEY = "{{ appkey }}"
@@ -83,6 +84,21 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 	} else {
 		http.Error(w, "GET or POST requests only", http.StatusMethodNotAllowed)
 	}
+}
+
+func handleLogout(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "POST requests only", http.StatusMethodNotAllowed)
+		return
+	}
+	cookie := &http.Cookie{
+		Name: "todone",
+		Value: "",
+		Path: "/",
+		MaxAge: -1,
+		HttpOnly: true,
+	}
+	http.SetCookie(w, cookie)
 }
 
 
