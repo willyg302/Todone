@@ -9,7 +9,8 @@ var paths = {
 	assets: [
 		'./app/*.html',
 		'./app/*.yaml',
-		'./app/*.go',
+		'./app/todone.go',
+		'./app/utils.go',
 		'./app/img/**/*.*'
 	],
 	app: './app',

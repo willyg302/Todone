@@ -5,24 +5,32 @@
 
 (enable-console-print!)
 
-(def app-state (atom {:text "Hello world!"}))
+
+;;;; UTILS
 
 ; @TODO: This is just a placeholder, actually grab from AJAX
 (def cal (moment/interval (moment/date-time 2014 9 9)
                           (moment/plus (moment/now) (moment/years 1))))
 
+(defn same-day?
+  [a b]
+  (and (= (moment/year a) (moment/year b))
+       (= (moment/month a) (moment/month b))
+       (= (moment/day a) (moment/day b))))
 
-(defn today? [val]
-  (let [today (moment/now)]
-    (and (= (moment/year val) (moment/year today))
-         (= (moment/month val) (moment/month today))
-         (= (moment/day val) (moment/day today)))))
+(defn today?
+  [day]
+  (same-day? (moment/now) day))
 
-
-;;;; COMPONENTS
 
 ; @TODO: SO MANY MAGIC NUMBERS. MUST GET RID OF
 
+;;;; GLOBAL STATE
+
+(def app-state (atom {:selected-day (moment/now)}))
+
+
+;;;; COMPONENTS
 
 (defn header []
   [:header
@@ -41,8 +49,9 @@
           :height w
           :x (* (quot offset 7) (+ w p))
           :y (* (rem offset 7) (+ w p))
-          :fill (if (today? m) "red" "#eeeeee")
-          :data-i m}])
+          :fill (if (same-day? (@app-state :selected-day) m) "red" "#eeeeee")
+          :data-i m
+          :on-click #(swap! app-state assoc :selected-day m)}])
 
 (defn calendar [num-days]
   (let [start-offset (mod (moment/day-of-week (moment/start cal)) 7)

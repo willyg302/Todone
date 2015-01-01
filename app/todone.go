@@ -15,6 +15,7 @@ func init() {
 	http.HandleFunc("/", handleRoot)
 	http.HandleFunc("/auth", handleAuth)
 	http.HandleFunc("/logout", handleLogout)
+	http.HandleFunc("/get", handleGet)
 	http.HandleFunc("/todone", handleAPI)
 	http.HandleFunc("/cron", handleCron)
 }
@@ -276,6 +277,23 @@ func handleAPI(w http.ResponseWriter, r *http.Request) {
 	default:
 		Log(c, r, "warning", "Unrecognized API endpoint hit: %s", path[1])
 	}
+}
+
+
+
+
+
+////////////////////////////////////////
+// DATASTORE GETS
+////////////////////////////////////////
+
+func handleGet(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "POST requests only", http.StatusMethodNotAllowed)
+		return
+	}
+	//c := appengine.NewContext(r)
+	//var days[] Day;
 }
 
 
