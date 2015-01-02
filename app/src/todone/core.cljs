@@ -23,11 +23,18 @@
   [day]
   (same-day? (moment/now) day))
 
+; Overrides the incorrect versions in cljs-time
+
 (defn within?
   [interval date]
   (or (same-day? (moment/start interval) date)
       (moment/within? interval date)
       (same-day? (moment/end interval) date)))
+
+(defn overlaps?
+  [a b]
+  (or (within? a (moment/start b))
+      (within? b (moment/start a))))
 
 (defn interval-string
   [interval]
@@ -45,8 +52,34 @@
 ;;;; GLOBAL STATE
 
 (def app-state (atom {
-  :selected-days (moment/interval (moment/now) (moment/now))}))
+  :selected-days (moment/interval (moment/now) (moment/now))
+  :days (sorted-map)
+  :todos (sorted-map)}))
 
+(def counter (atom 0))
+
+(defn add-todo [text interval]
+  (let [id (swap! counter inc)]
+    (swap! app-state assoc-in [:todos id] {:id id
+                                           :title text
+                                           :interval interval})))
+
+(add-todo "Call mom" (moment/interval (moment/date-time 2014 10 9) (moment/date-time 2014 10 9)))
+(add-todo "Go to the store" (moment/interval (moment/date-time 2014 11 15) (moment/date-time 2014 12 1)))
+(add-todo "This is today" (moment/interval (moment/now) (moment/now)))
+
+
+(defn add-day [d]
+  (swap! app-state assoc-in [:days d] {:id d
+                                       :date (moment/plus (moment/start cal) (moment/days d))
+                                       :status (rand-int 3)}))
+
+(defn add-days []
+  (let [numdays (moment/in-days (moment/interval (moment/start cal) (moment/now)))]
+    (doseq [d (range (+ numdays 1))]
+      (add-day d))))
+
+(add-days)
 
 ;;;; COMPONENTS
 
@@ -70,18 +103,23 @@
                          (moment/latest start m))))
     (swap! app-state assoc :selected-days (moment/interval m m))))
 
-(defn get-day-color [m]
+(defn get-day-color [d m]
   (cond
-    (within? (@app-state :selected-days) m) "red"
+    (within? (@app-state :selected-days) m) "blue"
+    (contains? (@app-state :days) d)
+      (case (((@app-state :days) d) :status)
+        0 "red"
+        1 "green"
+        "#eeeeee")
     (moment/after? m (moment/now)) "#888888"
     :else "#eeeeee"))
 
-(defn day [m w p offset]
+(defn day [d m w p offset]
   [:rect {:width w
           :height w
           :x (* (quot offset 7) (+ w p))
           :y (* (rem offset 7) (+ w p))
-          :fill (get-day-color m)
+          :fill (get-day-color d m)
           :data-i m
           :on-click (fn [e] (handle-day-click e m))}])
 
@@ -93,60 +131,53 @@
         [:svg#calendar {:width cal-width}
           (for [d (range num-days)]
             ^{:key d} (let [m (moment/plus (moment/start cal) (moment/days d))]
-                        [day m 36 4 (+ d start-offset)]))]]]))
+                        [day d m 36 4 (+ d start-offset)]))]]]))
 
 
+(defn todo-item [item]
+  [:div.panel.panel-default
+    [:div.panel-body
+      (item :title)]])
 
 (defn todo-list []
   [:div#list.col-md-8
     [:h1.page-header (interval-string (@app-state :selected-days))]
-    ]
-  )
-
-
-; <div id="list" class="col-md-8">
-;   <h1 class="page-header">Oct 9, 2014 &ndash; Nov 11, 2014</h1>
-;   <div class="panel panel-default">
-;     <div class="panel-body">
-;       Walk the dog
-;     </div>
-;   </div>
-;   <div class="panel panel-default">
-;     <div class="panel-body">
-;       Call Mom
-;     </div>
-;   </div>
-; </div>
+    (for [d (filter #(overlaps? (@app-state :selected-days) (% :interval)) (vals (@app-state :todos)))]
+      ^{:key (d :id)} [todo-item d])])
 
 
 (defn sidebar-panel [title content]
   [:div.panel.panel-default
     [:div.panel-heading title]
-    [:div.panel-body content]])
+    (into [:div.panel-body] content)])
+
+
+(defn get-longest-chain []
+  (let [p (partition-by #(= (% :status) 1) (vals (@app-state :days)))
+        c (filter #(= ((first %) :status) 1) p)]
+    (first (sort-by count > c))))
+
+(defn get-current-chain []
+  (let [p (partition-by #(= (% :status) 1) (vals (@app-state :days)))
+        c (filter #(= (% :status) 1) (last p))]
+    c))
 
 (defn sidebar []
   [:div#sidebar.col-md-4
-    [sidebar-panel "Longest Chain" "yo"]
-    [sidebar-panel "Current Chain" "yo"]])
-
-
-
-; <div id="sidebar" class="col-md-4">
-;   <div class="panel panel-default">
-;     <div class="panel-heading">Longest Chain</div>
-;     <div class="panel-body">
-;       <h1 class="text-center"><span id="longest-length"></span> days</h1>
-;       <p class="text-center"><small id="longest-range"></small></p>
-;     </div>
-;   </div>
-;   <div class="panel panel-default">
-;     <div class="panel-heading">Current Chain</div>
-;     <div class="panel-body">
-;       <h1 class="text-center"><span id="current-length"></span> days</h1>
-;       <p class="text-center"><small id="current-range"></small></p>
-;     </div>
-;   </div>
-; </div>
+    [sidebar-panel "Longest Chain"
+      (let [longest-chain (get-longest-chain)
+            longest-interval (moment/interval ((first longest-chain) :date)
+                                              ((last longest-chain) :date))]
+        [
+          [:h1.text-center (str (count longest-chain) " days")]
+          [:p.text-center (interval-string longest-interval)]])]
+    [sidebar-panel "Current Chain" (let [current-chain (get-current-chain)]
+        [
+          [:h1.text-center (str (count current-chain) " days")]
+          [:p.text-center (if (zero? (count current-chain))
+            "Better get on that"
+            (interval-string (moment/interval ((first current-chain) :date)
+                                              ((last current-chain) :date))))]])]])
 
 
 (defn body []
