@@ -28,13 +28,83 @@
 					<h1 class="page-header">Oct 9, 2014 &ndash; Nov 11, 2014</h1>
 					<div class="panel panel-default">
 						<div class="panel-body">
-							Walk the dog
+							<button type="button" class="close">&#10006;</button>
+							<button type="button" class="close">&#9744;</button>
+							<button type="button" class="close">&#9998;</button>
+							<h4>Due: Jan 4, 2015</h4>
+							Walk the dog. And then do other stuff because I like to write a lot and see how this breaks formatting. Yup, I'm a rebel like that.
+						</div>
+					</div>
+					<div class="well">
+						<h3>Edit Todo</h3>
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label for="create-todo-text" class="col-sm-2 control-label">Todo</label>
+								<div class="col-sm-10">
+									<input class="form-control" id="create-todo-text" value="Call Mom">
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="create-todo-start" class="col-sm-2 control-label">Start</label>
+								<div class="col-sm-4">
+									<input type="date" class="form-control" id="create-todo-start" value="2014-01-04">
+								</div>
+								<label for="create-todo-due" class="col-sm-2 control-label">Due</label>
+								<div class="col-sm-4">
+									<input type="date" class="form-control" id="create-todo-due" value="2014-01-04">
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button type="submit" class="btn btn-primary">Save Changes</button>
+									<button type="submit" class="btn btn-default">Cancel</button>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-body bg-success">
+							<button type="button" class="close">&#10006;</button>
+							<button type="button" class="close">&#9745;</button>
+							<button type="button" class="close">&#9998;</button>
+							<h4>Due: Jan 4, 2015</h4>
+							I'm done!
 						</div>
 					</div>
 					<div class="panel panel-default">
-						<div class="panel-body">
-							Call Mom
+						<div class="panel-body bg-danger">
+							<button type="button" class="close">&#10006;</button>
+							<button type="button" class="close">&#9744;</button>
+							<button type="button" class="close">&#9998;</button>
+							<h4>Due: Jan 4, 2015</h4>
+							I'm overdue sad face
 						</div>
+					</div>
+					<div class="well">
+						<h3>Create New Todo</h3>
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label for="create-todo-text" class="col-sm-2 control-label">Todo</label>
+								<div class="col-sm-10">
+									<input class="form-control" id="create-todo-text">
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="create-todo-start" class="col-sm-2 control-label">Start</label>
+								<div class="col-sm-4">
+									<input type="date" class="form-control" id="create-todo-start">
+								</div>
+								<label for="create-todo-due" class="col-sm-2 control-label">Due</label>
+								<div class="col-sm-4">
+									<input type="date" class="form-control" id="create-todo-due">
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button type="submit" class="btn btn-primary">Create</button>
+								</div>
+							</div>
+						</form>
 					</div>
 				</div>
 				<div id="sidebar" class="col-md-4">

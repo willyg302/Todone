@@ -64,9 +64,10 @@
 (defn add-todo [text interval]
   (let [id (swap! counter inc)]
     (swap! app-state assoc-in [:todos id] {:id id
-                                           :title text
+                                           :content text
                                            :interval interval
-                                           :completed false})))
+                                           :completed false
+                                           :editing false})))
 
 (add-todo "Call mom" (t/interval (t/date-time 2014 10 9) (t/date-time 2014 10 9)))
 (add-todo "Go to the store" (t/interval (t/date-time 2014 11 15) (t/date-time 2014 12 1)))
@@ -147,15 +148,78 @@
 
 (defn todo-item [item]
   [:div.panel.panel-default
-    [:div.panel-body
-      (item :title)]])
+    [:div {:class (str "panel-body " (if (item :completed) "bg-success"))}
+      [:button.close {:type "button"
+                      :on-click #(swap! app-state update-in
+                                  [:todos]
+                                  dissoc (item :id))}
+        "\u2716"]
+      [:button.close {:type "button"
+                      :on-click #(swap! app-state update-in
+                                  [:todos (item :id) :completed]
+                                  not)}
+        (if (item :completed) "\u2611" "\u2610")]
+      [:button.close {:type "button"
+                      :on-click #(swap! app-state update-in
+                                  [:todos (item :id) :editing]
+                                  not)}
+        "\u270e"]
+      [:h4 (interval-str (item :interval))]
+      (item :content)]])
+
+(defn todo-edit [item]
+  [:div.well
+    [:h3 "Edit Todo"]
+    [:form.form-horizontal
+      [:div.form-group
+        [:label.col-sm-2.control-label "Todo"]
+        [:div.col-sm-10
+          [:input.form-control {:value (item :content)}]]]
+      [:div.form-group
+        [:label.col-sm-2.control-label "Start"]
+        [:div.col-sm-4
+          [:input.form-control {:type "date"
+                                :value (date-str (t/start (item :interval)) "yyyy-MM-dd")}]]
+        [:label.col-sm-2.control-label "Due"]
+        [:div.col-sm-4
+          [:input.form-control {:type "date"
+                                :value (date-str (t/end (item :interval)) "yyyy-MM-dd")}]]]
+      [:div.form-group
+        [:div.col-sm-offset-2.col-sm-10
+          [:button.btn.btn-primary "Save Changes"]
+          [:button.btn.btn-default {:on-click #(do (swap! app-state update-in
+                                                          [:todos (item :id) :editing]
+                                                          not) false)}
+            "Cancel"]]]]])
+
+(defn todo-new []
+  [:div.well
+    [:h3 "Create New Todo"]
+    [:form.form-horizontal
+      [:div.form-group
+        [:label.col-sm-2.control-label "Todo"]
+        [:div.col-sm-10
+          [:input.form-control]]]
+      [:div.form-group
+        [:label.col-sm-2.control-label "Start"]
+        [:div.col-sm-4
+          [:input.form-control {:type "date"
+                                :value (date-str (t/start (@app-state :selected-days)) "yyyy-MM-dd")}]]
+        [:label.col-sm-2.control-label "Due"]
+        [:div.col-sm-4
+          [:input.form-control {:type "date"
+                                :value (date-str (t/end (@app-state :selected-days)) "yyyy-MM-dd")}]]]
+      [:div.form-group
+        [:div.col-sm-offset-2.col-sm-10
+          [:button.btn.btn-primary "Create"]]]]])
 
 (defn todo-list []
   [:div#list.col-md-8
     [:h1.page-header (interval-str (@app-state :selected-days))]
     (for [d (filter #(overlaps? (@app-state :selected-days) (% :interval))
                     (vals (@app-state :todos)))]
-      ^{:key (d :id)} [todo-item d])])
+      ^{:key (d :id)} (if (d :editing) [todo-edit d] [todo-item d]))
+    [todo-new]])
 
 
 ;;; SIDEBAR

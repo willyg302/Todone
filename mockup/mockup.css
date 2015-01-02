@@ -1,4 +1,4 @@
-
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:300,400,700);
 
 #calendar {
 	overflow: hidden;
@@ -39,6 +39,8 @@
 	margin-top: 0;
 }
 
+
+
 #sidebar h1, #sidebar p {
 	margin: 0;
 }
@@ -57,4 +59,17 @@ header {
 .brand img {
 	height: 100%;
 	display: block;
+}
+
+
+#list .panel-body > h4 {
+	margin-top: 0;
+}
+
+#list h3 {
+	margin-top: 0;
+}
+
+form > .form-group:last-child {
+	margin-bottom: 0;
 }
