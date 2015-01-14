@@ -107,13 +107,29 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 // TODO
 ////////////////////////////////////////
 
+// A todo has the following properties:
+//   - Content: a string, describing what the todo is about
+//   - Interval [Start - End]: when the todo is "active"
+//   - Completed: true if the todo has been marked as done
+
+// A todo that is not completed, but whose End is in the past, is late.
+// When the daily cron job runs, the todo's state is considered according
+// to the following rules:
+//   - If a todo is due THAT DAY, then the day is red if the todo is not
+//     completed, otherwise it MAY be green
+//   - Any late todos automatically make the day red
+
+// The following todos show up in the list:
+//   - Todos whose Interval overlaps with the selected interval
+//   - Late todos (show up as red)
+
+
 type Todo struct {
 	Key string `datastore:",noindex"`
 	Content string `datastore:",noindex"`
 	Start time.Time
 	End time.Time
 	Completed bool
-	Pushed time.Time
 }
 
 // Puts the todo, given its key, into the datastore
@@ -130,7 +146,6 @@ func (todo *Todo) create(c appengine.Context) error {
 	}
 	todo.Key = skey
 	todo.Completed = false
-	todo.Pushed = *new(time.Time)
 	return todo.put(c, key)
 }
 

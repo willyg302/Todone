@@ -148,7 +148,8 @@
 
 (defn todo-item [item]
   [:div.panel.panel-default
-    [:div {:class (str "panel-body " (if (item :completed) "bg-success"))}
+    [:div {:class (str "panel-body "
+                       (if (item :completed) "bg-success"))}
       [:button.close {:type "button"
                       :on-click #(swap! app-state update-in
                                   [:todos]
@@ -167,51 +168,74 @@
       [:h4 (interval-str (item :interval))]
       (item :content)]])
 
+
+
+
+
+; (defn todo-input [{:keys [title on-save on-stop]}]
+;   (let [val (atom title)
+;         stop #(do (reset! val "")
+;                   (if on-stop (on-stop)))
+;         save #(let [v (-> @val str clojure.string/trim)]
+;                 (if-not (empty? v) (on-save v))
+;                 (stop))]
+;     (fn [props]
+;       [:input (merge props
+;                      {:type "text" :value @val :on-blur save
+;                       :on-change #(reset! val (-> % .-target .-value))
+;                       :on-key-down #(case (.-which %)
+;                                       13 (save)
+;                                       27 (stop)
+;                                       nil)})])))
+
+
+
+
+
+
+(defn todo-form [{:keys [title content interval on-save on-cancel]}]
+  (let [item (atom {:content content :interval interval})]
+    [:div.well
+      [:h3 title]
+      [:form.form-horizontal
+        [:div.form-group
+          [:label.col-sm-2.control-label "Todo"]
+          [:div.col-sm-10
+            [:input.form-control {:value (item :content)}]]]
+        [:div.form-group
+          [:label.col-sm-2.control-label "Start"]
+          [:div.col-sm-4
+            [:input.form-control {:type "date"
+                                  :value (date-str (t/start (item :interval)) "yyyy-MM-dd")}]]
+          [:label.col-sm-2.control-label "Due"]
+          [:div.col-sm-4
+            [:input.form-control {:type "date"
+                                  :value (date-str (t/end (item :interval)) "yyyy-MM-dd")}]]]
+        [:div.form-group
+          [:div.col-sm-offset-2.col-sm-10
+            [:button.btn.btn-primary {:on-click on-save} "Save"]
+            (if on-cancel
+              [:button.btn.btn-default {:on-click on-cancel} "Cancel"])]]]]))
+
+
+
+
 (defn todo-edit [item]
-  [:div.well
-    [:h3 "Edit Todo"]
-    [:form.form-horizontal
-      [:div.form-group
-        [:label.col-sm-2.control-label "Todo"]
-        [:div.col-sm-10
-          [:input.form-control {:value (item :content)}]]]
-      [:div.form-group
-        [:label.col-sm-2.control-label "Start"]
-        [:div.col-sm-4
-          [:input.form-control {:type "date"
-                                :value (date-str (t/start (item :interval)) "yyyy-MM-dd")}]]
-        [:label.col-sm-2.control-label "Due"]
-        [:div.col-sm-4
-          [:input.form-control {:type "date"
-                                :value (date-str (t/end (item :interval)) "yyyy-MM-dd")}]]]
-      [:div.form-group
-        [:div.col-sm-offset-2.col-sm-10
-          [:button.btn.btn-primary "Save Changes"]
-          [:button.btn.btn-default {:on-click #(do (swap! app-state update-in
-                                                          [:todos (item :id) :editing]
-                                                          not) false)}
-            "Cancel"]]]]])
+  [todo-form {:title "Edit Todo"
+              :content (item :content)
+              :interval (item :interval)
+              :on-cancel #(do (swap! app-state update-in
+                                     [:todos (item :id) :editing]
+                                     not) false)}])
+
+
 
 (defn todo-new []
-  [:div.well
-    [:h3 "Create New Todo"]
-    [:form.form-horizontal
-      [:div.form-group
-        [:label.col-sm-2.control-label "Todo"]
-        [:div.col-sm-10
-          [:input.form-control]]]
-      [:div.form-group
-        [:label.col-sm-2.control-label "Start"]
-        [:div.col-sm-4
-          [:input.form-control {:type "date"
-                                :value (date-str (t/start (@app-state :selected-days)) "yyyy-MM-dd")}]]
-        [:label.col-sm-2.control-label "Due"]
-        [:div.col-sm-4
-          [:input.form-control {:type "date"
-                                :value (date-str (t/end (@app-state :selected-days)) "yyyy-MM-dd")}]]]
-      [:div.form-group
-        [:div.col-sm-offset-2.col-sm-10
-          [:button.btn.btn-primary "Create"]]]]])
+  [todo-form {:title "Create New Todo"
+              :content ""
+              :interval (@app-state :selected-days)}])
+
+
 
 (defn todo-list []
   [:div#list.col-md-8
