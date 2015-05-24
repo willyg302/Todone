@@ -21,6 +21,10 @@
   ([date] (date-str date "MMM d, yyyy"))
   ([date formatter] (t-format/unparse (t-format/formatter formatter) date)))
 
+(defn str-date
+  ([date] (str-date date "MMM d, yyyy"))
+  ([date formatter] (t-format/parse (t-format/formatter formatter) date)))
+
 (defn interval-str
   ([{:keys [start end]}]
     (interval-str start end))
@@ -195,27 +199,39 @@
 
 (defn todo-form [{:keys [title content interval on-save on-cancel]}]
   (let [item (atom {:content content :interval interval})]
-    [:div.well
-      [:h3 title]
-      [:form.form-horizontal
-        [:div.form-group
-          [:label.col-sm-2.control-label "Todo"]
-          [:div.col-sm-10
-            [:input.form-control {:value (item :content)}]]]
-        [:div.form-group
-          [:label.col-sm-2.control-label "Start"]
-          [:div.col-sm-4
-            [:input.form-control {:type "date"
-                                  :value (date-str (t/start (item :interval)) "yyyy-MM-dd")}]]
-          [:label.col-sm-2.control-label "Due"]
-          [:div.col-sm-4
-            [:input.form-control {:type "date"
-                                  :value (date-str (t/end (item :interval)) "yyyy-MM-dd")}]]]
-        [:div.form-group
-          [:div.col-sm-offset-2.col-sm-10
-            [:button.btn.btn-primary {:on-click on-save} "Save"]
-            (if on-cancel
-              [:button.btn.btn-default {:on-click on-cancel} "Cancel"])]]]]))
+    (fn []
+      [:div.well
+        [:h3 title]
+        [:form.form-horizontal
+          [:div.form-group
+            [:label.col-sm-2.control-label "Todo"]
+            [:div.col-sm-10
+              [:input.form-control {:value (@item :content)
+                                    :on-change #(swap! item assoc-in
+                                                [:content]
+                                                (-> % .-target .-value))}]]]
+          [:div.form-group
+            [:label.col-sm-2.control-label "Start"]
+            [:div.col-sm-4
+              [:input.form-control {:type "date"
+                                    :value (date-str (t/start (@item :interval)) "yyyy-MM-dd")
+                                    :on-change #(swap! item assoc-in
+                                                [:interval :start]
+                                                (-> % .-target .-value (str-date "yyyy-MM-dd")))}]]
+            [:label.col-sm-2.control-label "Due"]
+            [:div.col-sm-4
+              [:input.form-control {:type "date"
+                                    :value (date-str (t/end (@item :interval)) "yyyy-MM-dd")
+                                    :on-change #(swap! item assoc-in
+                                                [:interval :end]
+                                                (-> % .-target .-value (str-date "yyyy-MM-dd")))}]]]
+          [:div.form-group
+            [:div.col-sm-offset-2.col-sm-10
+              [:button.btn.btn-primary {:on-click #(do (on-save @item)
+                                                       (swap! item assoc-in [:content] "")
+                                                       false)} "Save"]
+              (if on-cancel
+                [:button.btn.btn-default {:on-click #(do (on-cancel) false)} "Cancel"])]]]])))
 
 
 
@@ -224,16 +240,20 @@
   [todo-form {:title "Edit Todo"
               :content (item :content)
               :interval (item :interval)
-              :on-cancel #(do (swap! app-state update-in
-                                     [:todos (item :id) :editing]
-                                     not) false)}])
+              :on-save #(swap! app-state update-in
+                         [:todos (item :id)]
+                         merge % {:editing false})
+              :on-cancel #(swap! app-state update-in
+                          [:todos (item :id) :editing]
+                          not)}])
 
 
 
 (defn todo-new []
   [todo-form {:title "Create New Todo"
               :content ""
-              :interval (@app-state :selected-days)}])
+              :interval (@app-state :selected-days)
+              :on-save #(add-todo (% :content) (% :interval))}])
 
 
 
